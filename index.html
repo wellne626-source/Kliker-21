@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>NickGen — генератор ников</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0f1e 0%, #0c1225 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* главный блок — толстый, жирный, для пальцев */
+        .container {
+            max-width: 550px;
+            width: 100%;
+            background: rgba(10, 14, 28, 0.8);
+            backdrop-filter: blur(16px);
+            border-radius: 56px;
+            border: 1px solid rgba(120, 100, 255, 0.4);
+            box-shadow: 0 30px 40px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        /* шапка */
+        .header {
+            padding: 24px 24px 16px 24px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #b794f4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #9ca3d6;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* блок с ником */
+        .nick-box {
+            background: #03061a;
+            margin: 24px 20px;
+            border-radius: 48px;
+            padding: 32px 20px;
+            text-align: center;
+            border: 1px solid #2d3170;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .nickname {
+            font-size: 36px;
+            font-weight: 900;
+            word-break: break-word;
+            background: linear-gradient(135deg, #f0f3ff, #c5b0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            margin-bottom: 24px;
+            line-height: 1.3;
+        }
+
+        /* ряд кнопок — большие, жирные */
+        .button-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            padding: 14px 28px;
+            border-radius: 60px;
+            font-size: 18px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.1s linear;
+            font-family: inherit;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-copy {
+            background: #1e244a;
+            color: #e0e7ff;
+            border: 1px solid #4c55a0;
+        }
+
+        .btn-random {
+            background: linear-gradient(95deg, #3b2f9e, #6a41d9);
+            color: white;
+            box-shadow: 0 6px 14px rgba(90, 60, 200, 0.4);
+        }
+
+        /* панель настроек */
+        .settings {
+            padding: 10px 20px 30px 20px;
+        }
+
+        .setting-item {
+            margin-bottom: 28px;
+        }
+
+        .setting-label {
+            color: #bbc3ff;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        select {
+            width: 100%;
+            padding: 16px 20px;
+            background: #080d22;
+            border: 1px solid #3b4280;
+            border-radius: 60px;
+            color: white;
+            font-size: 17px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .slider-block {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            background: #080d22;
+            padding: 8px 20px;
+            border-radius: 60px;
+            border: 1px solid #3b4280;
+        }
+
+        .slider-block span {
+            font-size: 20px;
+            font-weight: bold;
+            color: #cdd6ff;
+            min-width: 45px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            background: #2d3370;
+            border-radius: 10px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 26px;
+            height: 26px;
+            background: #a885ff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 0 8px #b77cff;
+        }
+
+        .length-value {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #a9b4ff;
+        }
+
+        /* жирная главная кнопка */
+        .big-gen-btn {
+            margin: 15px 20px 30px 20px;
+        }
+
+        .btn-big {
+            width: 100%;
+            background: linear-gradient(105deg, #6d28d9, #a855f7);
+            border: none;
+            padding: 22px 20px;
+            border-radius: 80px;
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.1s;
+            box-shadow: 0 12px 25px rgba(109, 40, 217, 0.5);
+        }
+
+        .btn-big:active {
+            transform: scale(0.97);
+        }
+
+        .footer {
+            padding: 16px 20px 24px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(100, 80, 200, 0.25);
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #c7d0ff;
+        }
+
+        @media (max-width: 500px) {
+            .nickname {
+                font-size: 28px;
+            }
+            .btn-big {
+                font-size: 20px;
+                padding: 18px;
+            }
+            .btn {
+                padding: 12px 22px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>✨ Хочешь крутой ник? ✨</h1>
+        <p>Наш генератор поможет 🔥</p>
+    </div>
+
+    <div class="nick-box">
+        <div class="nickname" id="nickDisplay">ShadowRider</div>
+        <div class="button-group">
+            <button class="btn btn-copy" id="copyBtn">📋 Копировать</button>
+            <button class="btn btn-random" id="randomBtn">🎲 Случайный</button>
+        </div>
+    </div>
+
+    <div class="settings">
+        <div class="setting-item">
+            <div class="setting-label">🎨 Стиль</div>
+            <select id="styleSelect">
+                <option value="cyber">🤖 Киберпанк</option>
+                <option value="fantasy">🐉 Фэнтези</option>
+                <option value="edgy">🖤 Дарк / Эмо</option>
+                <option value="cute">🍰 Милый</option>
+                <option value="pro">🎮 Про-геймер</option>
+                <option value="random" selected>🌀 Рандом (всё подряд)</option>
+            </select>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-label">📏 Длина (символов)</div>
+            <div class="slider-block">
+                <span>4</span>
+                <input type="range" id="lengthSlider" min="4" max="20" value="10">
+                <span>20</span>
+            </div>
+            <div class="length-value" id="lengthText">10 символов</div>
+        </div>
+
+        <div class="setting-item">
+            <div class="setting-label">🔢 Цифры в нике</div>
+            <select id="numberSelect">
+                <option value="none">❌ Без цифр</option>
+                <option value="end" selected>➕ Добавить число в конец</option>
+                <option value="random">🎲 Цифра внутри</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="big-gen-btn">
+        <button class="btn-big" id="generateBtn">⚡ СГЕНЕРИРОВАТЬ НИК ⚡</button>
+    </div>
+
+    <div class="footer">
+        <span class="badge">🔥 10000+ вариантов</span>
+        <span class="badge">📱 Толстые кнопки</span>
+        <span class="badge">💎 Уникально каждый раз</span>
+    </div>
+</div>
+
+<script>
+    // ========== СЛОВАРИ ДЛЯ ГЕНЕРАЦИИ ==========
+    const stylesData = {
+        cyber: {
+            prefixes: ["Neon", "Cyber", "Void", "Pixel", "Glitch", "Razor", "Fusion", "Zero", "Nova", "Flux", "Synth", "Xeno", "Kode", "Tech", "Rogue", "Phantom", "Cipher", "Radix", "Data", "Hex"],
+            suffixes: ["Byte", "Core", "Ware", "Net", "X", "Crypt", "Link", "Bot", "Frame", "Glitch", "Matrix", "Drive", "Node", "Hack", "Wave", "Flux", "Bit", "Chip"]
+        },
+        fantasy: {
+            prefixes: ["Elder", "Frost", "Shadow", "Moon", "Star", "Dragon", "Rune", "Iron", "Silver", "Wild", "Mystic", "Sage", "Ember", "Storm", "Fang", "Thorn", "Aegis", "Warden", "Oaken"],
+            suffixes: ["Blade", "Claw", "Wind", "Walker", "Heart", "Soul", "Warden", "Shield", "Spell", "Mancer", "Bane", "Keeper", "Fury", "Wing", "Howl", "Strider", "Hammer"]
+        },
+        edgy: {
+            prefixes: ["Cursed", "Grave", "Blood", "Raven", "Noctis", "Venom", "Dark", "Wraith", "Hollow", "Sorrow", "Ashes", "Reaper", "Grim", "Vile", "Marrow", "Dread", "Night"],
+            suffixes: ["Shade", "Night", "Bane", "Fang", "Grim", "Mortis", "Sin", "Doom", "Whisper", "Vile", "Hate", "End", "Kill", "Reap", "Thorn", "Sorrow"]
+        },
+        cute: {
+            prefixes: ["Sweet", "Bunny", "Lily", "Candy", "Peach", "Jelly", "Puffy", "Honey", "Twinkle", "Snuggles", "Daisy", "Mochi", "Bubbles", "Neko", "Kiki", "Mimi", "Lulu", "Pixie"],
+            suffixes: ["Pop", "Bun", "Cake", "Puff", "Starlet", "Glitter", "Kiss", "Wink", "Berry", "Cookie", "Sunny", "Dolly", "Mochi", "Pie", "Cupcake", "Shine"]
+        },
+        pro: {
+            prefixes: ["Ace", "Godlike", "Blitz", "Instinct", "Legend", "Savage", "Zeus", "Rapid", "Quantum", "Toxic", "Vortex", "Prime", "Striker", "Elite", "ProX", "King", "Beast", "Fury"],
+            suffixes: ["Hunter", "Killer", "Shot", "Clutch", "Flash", "Strike", "Fury", "Rush", "Blitz", "X", "Pro", "King", "Ace", "Pwn", "God", "Slayer"]
+        }
+    };
+
+    // Дополнительные слова для удлинения
+    const extraWords = ["Storm", "Fire", "Dark", "Light", "Thunder", "Crystal", "Shadow", "Dusk", "Dawn", "Wolf", "Hawk", "Frost", "Flame", "Spirit"];
+
+    function getRandom(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function generateNick(styleRaw, targetLength, numberMode) {
+        // Определяем реальный стиль (если random — выбираем случайный)
+        let actualStyle = styleRaw;
+        if (styleRaw === "random") {
+            const keys = ["cyber", "fantasy", "edgy", "cute", "pro"];
+            actualStyle = getRandom(keys);
+        }
+        
+        const data = stylesData[actualStyle];
+        let prefix = getRandom(data.prefixes);
+        let suffix = getRandom(data.suffixes);
+        let nick = prefix + suffix;
+        
+        // Если нужно сделать подлиннее и есть возможность добавить слово посередине
+        if (targetLength > 12 && nick.length < targetLength - 4 && Math.random() > 0.5) {
+            let mid = getRandom(extraWords);
+            nick = prefix + mid + suffix;
+        }
+        
+        // Регулируем длину
+        if (nick.length > targetLength) {
+            nick = nick.substring(0, targetLength);
+        }
+        else if (nick.length < targetLength) {
+            let need = targetLength - nick.length;
+            let addition = "";
+            if (numberMode !== "none" && need > 0) {
+                for (let i = 0; i < need && i < 4; i++) {
+                    addition += Math.floor(Math.random() * 10);
+                }
+            } else if (need > 0) {
+                const letters = "xyzqwrt";
+                for (let i = 0; i < need && i < 3; i++) {
+                    addition += letters[Math.floor(Math.random() * letters.length)];
+                }
+            }
+            nick += addition;
+        }
+        
+        // Применяем цифры по выбранному режиму
+        if (numberMode === "end") {
+            let num = Math.floor(Math.random() * 90) + 10; // 10-99
+            if (nick.length + 2 <= targetLength + 2) {
+                nick += num;
+            } else {
+                nick += Math.floor(Math.random() * 10);
+            }
+        }
+        else if (numberMode === "random") {
+            if (nick.length > 2) {
+                let pos = Math.floor(Math.random() * (nick.length - 1)) + 1;
+                let digit = Math.floor(Math.random() * 10);
+                let before = nick.slice(0, pos);
+                let after = nick.slice(pos);
+                nick = before + digit + after;
+            } else {
+                nick += Math.floor(Math.random() * 10);
+            }
+        }
+        
+        // Финальная обрезка
+        if (nick.length > targetLength) {
+            nick = nick.substring(0, targetLength);
+        }
+        
+        // Делаем первую букву заглавной
+        if (nick.length > 0 && isNaN(parseInt(nick[0]))) {
+            nick = nick[0].toUpperCase() + nick.slice(1);
+        }
+        
+        if (nick.length === 0) nick = "Player";
+        return nick;
+    }
+
+    // Получить текущие настройки из UI
+    function getSettings() {
+        const style = document.getElementById("styleSelect").value;
+        const length = parseInt(document.getElementById("lengthSlider").value, 10);
+        const numberMode = document.getElementById("numberSelect").value;
+        return { style, length, numberMode };
+    }
+    
+    // Обновить ник на экране
+    function refreshNick() {
+        const { style, length, numberMode } = getSettings();
+        const newNick = generateNick(style, length, numberMode);
+        document.getElementById("nickDisplay").innerText = newNick;
+        return newNick;
+    }
+    
+    // Копирование в буфер
+    async function copyNick() {
+        const nickElement = document.getElementById("nickDisplay");
+        const nickText = nickElement.innerText;
+        if (!nickText) return;
+        
+        try {
+            await navigator.clipboard.writeText(nickText);
+            const btn = document.getElementById("copyBtn");
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = "✅ Скопировано!";
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+            }, 1500);
+        } catch (err) {
+            alert("Копируй вручную: " + nickText);
+        }
+    }
+    
+    // Обновление отображения длины
+    const lengthSlider = document.getElementById("lengthSlider");
+    const lengthText = document.getElementById("lengthText");
+    lengthSlider.addEventListener("input", function() {
+        lengthText.innerText = this.value + " символов";
+        // по желанию можно автообновлять ник (но не будем навязывать)
+    });
+    
+    // Кнопки
+    document.getElementById("generateBtn").addEventListener("click", () => {
+        refreshNick();
+    });
+    document.getElementById("randomBtn").addEventListener("click", () => {
+        refreshNick();
+    });
+    document.getElementById("copyBtn").addEventListener("click", copyNick);
+    
+    // Генерируем первый ник при загрузке
+    refreshNick();
+</script>
+</body>
+                                                                       </html>
